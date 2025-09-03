@@ -1,0 +1,11 @@
+{
+  "minLength": 10,
+  "requireUpper": true,
+  "requireLower": true,
+  "requireDigit": true,
+  "requireSymbol": true,
+  "dictionaryPath": "config/dictionary.txt",
+  "historyCount": 3,
+  "lockoutThreshold": 3,
+  "lockoutWindowMinutes": 15
+}
