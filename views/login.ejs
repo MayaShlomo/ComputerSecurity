@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - Communication LTD</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <meta name="app-safe" content="/login" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- נועל BACK לעמוד הלוגין -->
+  <script src="/js/navlock.js" defer></script>
+</head>
+<body class="login-page">
+  <header>
+    <h1>Communication LTD</h1>
+    <p>Secure Login</p>
+  </header>
+
+  <div class="container">
+    <h2>Login</h2>
+
+    <% if (error) { %><div class="error"><%= error %></div><% } %>
+    <% if (success) { %><div class="success"><%= success %></div><% } %>
+
+    <form action="/login" method="post" autocomplete="off">
+      <div>
+        <label>Username:
+          <input type="text" name="username" required autocapitalize="off" autocomplete="username">
+        </label>
+      </div>
+      <div>
+        <label>Password:
+          <input type="password" name="password" required autocomplete="current-password">
+        </label>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="links">
+      <a href="/forgot-password" class="replace-link">Forgot your password?</a> |
+      <a href="/register" class="replace-link">New user? Register here</a>
+    </div>
+  </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

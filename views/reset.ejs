@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reset Password - Communication LTD</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+</head>
+<body class="reset-page">
+  <header><h1>Reset Password</h1></header>
+
+  <main class="container">
+    <% if (error) { %><div class="error"><%= error %></div><% } %>
+    <% if (success) { %><div class="success"><%= success %></div><% } %>
+
+    <form action="/reset" method="post" autocomplete="off">
+      <label>Token:
+        <input type="text" name="token" required autocapitalize="off" autocomplete="one-time-code" />
+      </label><br />
+      <label>New Password:
+        <input type="password" name="newPassword" required autocomplete="new-password" />
+      </label><br />
+      <label>Confirm Password:
+        <input type="password" name="confirmPassword" required autocomplete="new-password" />
+      </label><br />
+      <button type="submit">Change Password</button>
+    </form>
+
+    <div class="password-policy" style="margin-top:12px">
+      <strong>Password Policy:</strong>
+      <ul>
+        <li>At least 10 characters</li>
+        <li>Uppercase, lowercase, digit, special character</li>
+        <li>No reuse of last 3 passwords</li>
+      </ul>
+    </div>
+
+    <div class="links" style="margin-top:12px">
+      <a class="replace-link" href="/login" onclick="event.preventDefault(); location.replace('/login');">Back to Login</a>
+    </div>
+  </main>
+
+  <script>
+    if (history.replaceState) history.replaceState(null, "", location.pathname);
+    document.querySelectorAll(".replace-link").forEach(a=>{
+      a.addEventListener("click",(ev)=>{ ev.preventDefault(); location.replace(a.href); });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+

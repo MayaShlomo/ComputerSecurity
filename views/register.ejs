@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register - Communication LTD</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+</head>
+<body class="register-page">
+  <div class="container">
+    <h1>Create a New Account</h1>
+
+    <% if (error) { %><div class="error"><%= error %></div><% } %>
+    <% if (success) { %><div class="success"><%= success %></div><% } %>
+
+    <form action="/register" method="POST" autocomplete="off">
+      <div><label>Username: <input type="text" name="username" required autocomplete="username" autocapitalize="off" /></label></div>
+      <div><label>Email: <input type="email" name="email" required autocomplete="email" /></label></div>
+      <div><label>Password: <input type="password" name="password" required autocomplete="new-password" /></label></div>
+      <div><label>Confirm: <input type="password" name="confirmPassword" required autocomplete="new-password" /></label></div>
+      <button type="submit">Register</button>
+    </form>
+
+    <div class="password-policy">
+      <strong>Password Policy:</strong>
+      <ul>
+        <li>At least 10 chars</li>
+        <li>Uppercase, lowercase, digit, special</li>
+        <li>No reuse of last 3</li>
+      </ul>
+    </div>
+
+    <div class="links">
+      Already have an account?
+      <a href="/login" class="replace-link" onclick="event.preventDefault(); location.replace('/login');">Login here</a>
+    </div>
+  </div>
+
+  <script>
+    // לא לשמור querystring/שגיאות בהיסטוריה בעמוד הזה
+    if (history.replaceState) history.replaceState(null, "", location.pathname);
+    // למקרה שאין JS חיצוני — גם כאן מחליפים (דאבל-בטיחות)
+    document.querySelectorAll(".replace-link").forEach(a=>{
+      a.addEventListener("click", (ev)=>{ ev.preventDefault(); location.replace(a.href); });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+

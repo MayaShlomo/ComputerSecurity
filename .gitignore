@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# env & secrets
+.env
+.env.local
+
+# builds / temp
+dist/
+build/
+coverage/
+.cache/
+.DS_Store
+Thumbs.db

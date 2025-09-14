@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Forgot Password - Communication LTD</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+</head>
+<body class="forgot-page">
+  <div class="container">
+    <h1>Forgot Password</h1>
+    <p>Enter your email to receive a reset token.</p>
+
+    <% if (error) { %><div class="error"><%= error %></div><% } %>
+    <% if (success) { %><div class="success"><%= success %></div><% } %>
+
+    <form action="/forgot-password" method="post" autocomplete="off">
+      <label>Email:
+        <input type="email" name="email" required autocomplete="username" />
+      </label>
+      <button type="submit">Send Reset Token</button>
+    </form>
+
+    <div class="links">
+      <a href="/login" class="replace-link" onclick="event.preventDefault(); location.replace('/login');">Back to Login</a>
+    </div>
+  </div>
+
+  <script>
+    if (history.replaceState) history.replaceState(null, "", location.pathname);
+    document.querySelectorAll(".replace-link").forEach(a=>{
+      a.addEventListener("click",(ev)=>{ ev.preventDefault(); location.replace(a.href); });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
