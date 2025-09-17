@@ -1,3 +1,4 @@
+// src/repositories/mysqlRepo.js
 const mysql = require('mysql2/promise');
 const MODE = process.env.MODE || 'secure'; // 'vuln' | 'secure'
 let connection = null;
@@ -8,36 +9,82 @@ const mysqlRepo = {
       host: process.env.DB_HOST || 'localhost',
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASS || '',
-      database: process.env.DB_NAME || 'comunicationltd'
+      database: process.env.DB_NAME || 'comunicationltd',
+      // אופציונלי: מדליקים multipleStatements רק במצב פגיע (להדגמות מתקדמות)
+      multipleStatements: MODE === 'vuln',
     });
-    console.log('✅ Connected to MySQL database (MODE=' + MODE + ')');
+    console.log(
+      '✅ Connected to MySQL database (MODE=' +
+        MODE +
+        (MODE === 'vuln' ? ', multipleStatements=ON' : '') +
+        ')'
+    );
   },
 
   async createUser(username, email, passwordHash, salt) {
-    const [res] = await connection.execute(
-      'INSERT INTO users (username, email, password_hash, salt) VALUES (?, ?, ?, ?)',
-      [username, email, passwordHash, salt]
-    );
-    return { id: res.insertId, username, email, password_hash: passwordHash, salt };
+    if (MODE === 'vuln') {
+      const sql = `INSERT INTO users (username, email, password_hash, salt)
+                   VALUES ('${username}', '${email}', '${passwordHash}', '${salt}')`;
+      if (MODE === 'vuln') console.log('[VULN SQL:createUser]', sql);
+      await connection.query(sql);
+      const [rows] = await connection.query(
+        'SELECT * FROM users ORDER BY id DESC LIMIT 1'
+      );
+      return rows[0] || { username, email, password_hash: passwordHash, salt };
+    } else {
+      const [res] = await connection.execute(
+        'INSERT INTO users (username, email, password_hash, salt) VALUES (?, ?, ?, ?)',
+        [username, email, passwordHash, salt]
+      );
+      return { id: res.insertId, username, email, password_hash: passwordHash, salt };
+    }
+  },
+
+  // 👇 פונקציה פגיעה לאימות ע"י SQL (משמשת לעקיפת לוגין ב-MODE=vuln)
+  async authByUserAndHash(username, passwordHash) {
+    if (MODE === 'vuln') {
+      const sql = `SELECT * FROM users
+                   WHERE username='${username}' AND password_hash='${passwordHash}'`;
+      if (MODE === 'vuln') console.log('[VULN SQL:authByUserAndHash]', sql);
+      const [rows] = await connection.query(sql);
+      return rows[0] || null;
+    } else {
+      const [rows] = await connection.execute(
+        'SELECT * FROM users WHERE username = ? AND password_hash = ?',
+        [username, passwordHash]
+      );
+      return rows[0] || null;
+    }
   },
 
   async findByUsername(username) {
     if (MODE === 'vuln') {
-      const [rows] = await connection.query(`SELECT * FROM users WHERE username = '${username}'`);
+      const sql = `SELECT * FROM users WHERE username = '${username}'`;
+      if (MODE === 'vuln') console.log('[VULN SQL:findByUsername]', sql);
+      const [rows] = await connection.query(sql);
       return rows[0] || null;
     } else {
-      const [rows] = await connection.execute('SELECT * FROM users WHERE username = ?', [username]);
+      const [rows] = await connection.execute(
+        'SELECT * FROM users WHERE username = ?',
+        [username]
+      );
       return rows[0] || null;
     }
   },
 
   async findByEmail(email) {
-    const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+    const [rows] = await connection.execute(
+      'SELECT * FROM users WHERE email = ?',
+      [email]
+    );
     return rows[0] || null;
   },
 
   async findById(id) {
-    const [rows] = await connection.execute('SELECT * FROM users WHERE id = ?', [id]);
+    const [rows] = await connection.execute(
+      'SELECT * FROM users WHERE id = ?',
+      [id]
+    );
     return rows[0] || null;
   },
 
@@ -57,14 +104,12 @@ const mysqlRepo = {
 
   async getPasswordHistory(userId, limit = 3) {
     const safeLimit = Number.isFinite(+limit) ? Math.max(0, parseInt(limit, 10)) : 3;
-    const [rows] = await connection.query(
-      `SELECT password_hash 
-       FROM password_history 
-       WHERE user_id = ? 
-       ORDER BY created_at DESC 
-       LIMIT ${safeLimit}`,
-      [userId]
-    );
+    const sql = `SELECT password_hash
+                 FROM password_history
+                 WHERE user_id = ?
+                 ORDER BY created_at DESC
+                 LIMIT ${safeLimit}`;
+    const [rows] = await connection.query(sql, [userId]);
     return rows;
   },
 
@@ -112,9 +157,13 @@ const mysqlRepo = {
 
   async addCustomer(name, email, phone = null) {
     if (MODE === 'vuln') {
-      const sql = `INSERT INTO customers (name, email, phone) VALUES ('${name}', '${email}', '${phone}')`;
+      const sql = `INSERT INTO customers (name, email, phone)
+                   VALUES ('${name}', '${email}', '${phone}')`;
+      if (MODE === 'vuln') console.log('[VULN SQL:addCustomer]', sql);
       await connection.query(sql);
-      const [rows] = await connection.query('SELECT * FROM customers ORDER BY id DESC LIMIT 1');
+      const [rows] = await connection.query(
+        'SELECT * FROM customers ORDER BY id DESC LIMIT 1'
+      );
       return rows[0];
     } else {
       const [res] = await connection.execute(
@@ -130,7 +179,8 @@ const mysqlRepo = {
       'SELECT * FROM customers ORDER BY created_at DESC'
     );
     return rows;
-  }
+  },
 };
 
 module.exports = mysqlRepo;
+
