@@ -32,7 +32,6 @@ function checkDictionary(password) {
   return { ok: true };
 }
 
-// newHash - hex string; lastHashes - array of hex strings (descending order)
 function checkHistory(newHash, lastHashes = []) {
   const n = Number(cfg.historyCount) || 3;
   if (lastHashes.slice(0, n).includes(newHash)) {
