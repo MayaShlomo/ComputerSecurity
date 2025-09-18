@@ -113,18 +113,18 @@ const mysqlRepo = {
     return rows;
   },
 
-  async incFailed(username) {
-    await connection.execute(
-      `UPDATE users SET 
-         failed_attempts = failed_attempts + 1,
-         locked_until = CASE 
-           WHEN failed_attempts >= 2 THEN DATE_ADD(NOW(), INTERVAL 15 MINUTE) 
-           ELSE locked_until 
-         END
-       WHERE username = ?`,
-      [username]
-    );
-  },
+    async incFailed(username) {
+      await connection.execute(
+        `UPDATE users SET 
+          failed_attempts = failed_attempts + 1,
+          locked_until = CASE 
+            WHEN failed_attempts >= 3 THEN DATE_ADD(NOW(), INTERVAL 15 MINUTE)
+            ELSE locked_until 
+          END
+        WHERE username = ?`,
+        [username]
+      );
+    },
 
   async resetFailed(username) {
     await connection.execute(
