@@ -9,13 +9,9 @@
   <meta http-equiv="Expires" content="0" />
   <meta name="referrer" content="no-referrer" />
 
-  <!-- נועל Back, רץ מוקדם מאוד -->
   <script>
     (function () {
       "use strict";
-
-      // אם הגענו לכאן מעמוד שאינו /system (למשל change-password),
-      // נחליף את הרשומה הקודמת כדי שלא יהיה לאן "לחזור".
       try {
         if (document.referrer && !/\/system(\?|$)/.test(new URL(document.referrer).pathname)) {
           history.replaceState(null, "", location.href);
@@ -24,18 +20,12 @@
         history.replaceState(null, "", location.href);
       }
 
-      // אל תצברי querystring בהיסטוריה
       if (history.replaceState) history.replaceState(null, "", location.pathname);
-
-      // כדי לנטרל BFCache (בחלק מהדפדפנים) ולהימנע משחזור דפים קודמים
       addEventListener("unload", function(){});
-
-      // דוחפים שתי רשומות, וכל Back מחזיר אותנו מיד ל-/system
       history.pushState({lock:true},"",location.href);
       history.pushState({lock:true},"",location.href);
 
       addEventListener("popstate", function () {
-        // קפיצה קדימה ואז החלפה ל-/system כדי לוודא שלא יצאנו מהעמוד
         history.go(1);
         location.replace("/system");
       });
@@ -86,7 +76,6 @@
   </main>
 
   <script>
-    // ביטוח כפול: כל קישור עם replace-link ינווט ב-replace (גם אם הסקריפט העליון עוד לא נטען)
     document.querySelectorAll(".replace-link").forEach(function (a) {
       a.addEventListener("click", function (ev) {
         ev.preventDefault();

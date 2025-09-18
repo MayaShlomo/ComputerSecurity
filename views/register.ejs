@@ -39,9 +39,7 @@
   </div>
 
   <script>
-    // לא לשמור querystring/שגיאות בהיסטוריה בעמוד הזה
     if (history.replaceState) history.replaceState(null, "", location.pathname);
-    // למקרה שאין JS חיצוני — גם כאן מחליפים (דאבל-בטיחות)
     document.querySelectorAll(".replace-link").forEach(a=>{
       a.addEventListener("click", (ev)=>{ ev.preventDefault(); location.replace(a.href); });
     });

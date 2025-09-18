@@ -1,4 +1,3 @@
-// Benny — Security: password policy (complexity + dictionary + history)
 const fs = require('fs');
 const path = require('path');
 const cfg = require('../../config/security.config.json');

@@ -1,6 +1,5 @@
-// src/repositories/mysqlRepo.js
 const mysql = require('mysql2/promise');
-const MODE = process.env.MODE || 'secure'; // 'vuln' | 'secure'
+const MODE = process.env.MODE || 'secure'; 
 let connection = null;
 
 const mysqlRepo = {
@@ -10,11 +9,10 @@ const mysqlRepo = {
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASS || '',
       database: process.env.DB_NAME || 'comunicationltd',
-      // אופציונלי: מדליקים multipleStatements רק במצב פגיע (להדגמות מתקדמות)
       multipleStatements: MODE === 'vuln',
     });
     console.log(
-      '✅ Connected to MySQL database (MODE=' +
+      'Connected to MySQL database (MODE=' +
         MODE +
         (MODE === 'vuln' ? ', multipleStatements=ON' : '') +
         ')'
@@ -40,7 +38,6 @@ const mysqlRepo = {
     }
   },
 
-  // 👇 פונקציה פגיעה לאימות ע"י SQL (משמשת לעקיפת לוגין ב-MODE=vuln)
   async authByUserAndHash(username, passwordHash) {
     if (MODE === 'vuln') {
       const sql = `SELECT * FROM users
@@ -88,7 +85,7 @@ const mysqlRepo = {
     return rows[0] || null;
   },
 
-  async updatePassword(userId, passwordHash /*, saltIgnored */) {
+  async updatePassword(userId, passwordHash) {
     await connection.execute(
       'UPDATE users SET password_hash = ? WHERE id = ?',
       [passwordHash, userId]

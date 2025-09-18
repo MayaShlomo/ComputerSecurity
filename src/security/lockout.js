@@ -1,4 +1,3 @@
-// Benny — Security: account lockout logic
 const cfg = require('../../config/security.config.json');
 
 function isLocked(user) {

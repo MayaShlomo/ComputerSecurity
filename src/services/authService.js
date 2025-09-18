@@ -1,4 +1,3 @@
-// src/services/authService.js
 'use strict';
 
 const nodemailer = require('nodemailer');
@@ -8,12 +7,9 @@ const { hmacSha1, newSalt, newResetToken } = require('../security/hash');
 const { validateComplexity, checkDictionary, checkHistory } = require('../security/policy');
 const { isLocked } = require('../security/lockout');
 
-const MODE = process.env.MODE || 'secure'; // 'vuln' | 'secure'
+const MODE = process.env.MODE || 'secure'; 
 const PASSWORD_HISTORY_COUNT = 3;
 
-/**
- * Register
- */
 async function register({ username, email, password }) {
   const u = await repo.findByUsername(username);
   if (u) return { ok: false, error: 'Username already exists' };
@@ -36,15 +32,9 @@ async function register({ username, email, password }) {
   return { ok: true };
 }
 
-/**
- * Login
- * secure: בודק סיסמה בקוד (HMAC-SHA1 עם salt אמיתי)
- * vuln:   מאמת כולו ב-SQL (repo.authByUserAndHash) לצורך הדגמת SQLi ועקיפה
- */
 async function login({ username, password }) {
   if (MODE === 'vuln') {
-    // 👇 מסלול פגיע: תנאי AND password_hash='...' יימחק ע"י הזרקה (' OR 1=1 #)
-    const fakeHash = hmacSha1(password, 'dummy'); // ערך "כלשהו" לשאילתה
+    const fakeHash = hmacSha1(password, 'dummy'); 
     const user = await repo.authByUserAndHash(username, fakeHash);
 
     if (user) {
@@ -55,7 +45,6 @@ async function login({ username, password }) {
     return { ok: false, error: 'Invalid username or password' };
   }
 
-  // --- secure path ---
   const user = await repo.findByUsername(username);
   if (!user) return { ok: false, error: 'Invalid username or password' };
 
@@ -73,9 +62,6 @@ async function login({ username, password }) {
   return { ok: true };
 }
 
-/**
- * Change Password
- */
 async function changePassword({ username, oldPassword, newPassword }) {
   const user = await repo.findByUsername(username);
   if (!user) return { ok: false, error: 'User not found' };
@@ -89,7 +75,6 @@ async function changePassword({ username, oldPassword, newPassword }) {
   const dict = checkDictionary(newPassword);
   if (!dict.ok) return { ok: false, error: dict.reason };
 
-  // נשארים עם אותו salt כדי לאפשר בדיקת היסטוריה לפי hash
   const newHash = hmacSha1(newPassword, user.salt);
 
   const history = await repo.getPasswordHistory(user.id, PASSWORD_HISTORY_COUNT);
@@ -103,14 +88,11 @@ async function changePassword({ username, oldPassword, newPassword }) {
   return { ok: true };
 }
 
-/**
- * Forgot Password (send reset token)
- */
 async function forgotPassword(email) {
   const user = await repo.findByEmail(email);
   if (!user) return { ok: false, error: 'User not found' };
 
-  const token = newResetToken(); // 40 hex (SHA-1)
+  const token = newResetToken(); 
   await repo.createPasswordReset(user.id, token);
 
   const transporter = nodemailer.createTransport({
@@ -128,9 +110,6 @@ async function forgotPassword(email) {
   return { ok: true };
 }
 
-/**
- * Reset Password (with token)
- */
 async function resetPassword({ token, newPassword }) {
   const reset = await repo.findPasswordReset(token);
   if (!reset || reset.used) return { ok: false, error: 'Invalid token' };
@@ -159,9 +138,6 @@ async function resetPassword({ token, newPassword }) {
   return { ok: true };
 }
 
-/**
- * Customers
- */
 async function addCustomer(name, email, phone) {
   const c = await repo.addCustomer(name, email || null, phone || null);
   return c ? { ok: true } : { ok: false, error: 'Failed to add customer' };

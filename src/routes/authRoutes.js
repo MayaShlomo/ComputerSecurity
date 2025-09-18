@@ -53,7 +53,7 @@ router.post("/login", async (req, res) => {
     const result = await authService.login({ username, password });
     if (result.ok) {
       req.session.username = username;
-      return replaceTo(res, "/system"); // לא מוסיף היסטוריה
+      return replaceTo(res, "/system"); 
     }
     return replaceTo(res, "/login?error=" + encodeURIComponent(result.error));
   } catch {
